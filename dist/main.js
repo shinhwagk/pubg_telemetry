@@ -4,25 +4,25 @@ const fang_diren = new Set();
 const telemetry_data = [];
 const user_id_map = new Map();
 function print_LogPlayerRevive(event) {
+    return null;
 }
 function print_LogPlayerMakeGroggy(event) {
+    return null;
 }
-function print_LogPlayerKillV2(event) { }
-function print_LogPlayerUseThrowable(event) { }
+function print_LogPlayerKillV2(event) {
+    return null;
+}
+function print_LogPlayerUseThrowable(event) {
+    return null;
+}
 function print_LogPlayerTakeDamage(event) {
-    if (event._T !== "LogPlayerTakeDamage") {
-        return null;
-    }
-    if (!event.attacker || !event.victim) {
+    if (!event.attacker || !event.victim || fang_youren.size < 1) {
         return null;
     }
     const attackerId = event.attacker.accountId;
     const victimId = event.victim.accountId;
     const attackerName = user_id_map.get(attackerId) || attackerId;
     const victimName = user_id_map.get(victimId) || victimId;
-    if (fang_youren.size < 1) {
-        return null;
-    }
     const attackerHealth = event.attacker.health.toFixed(2);
     const victimHealth = event.victim.health.toFixed(2);
     const damageInfo = `${event.damageTypeCategory} ${event.damageCauserName} 伤害 ${event.damage.toFixed(2)}`;
@@ -31,24 +31,65 @@ function print_LogPlayerTakeDamage(event) {
     const isAttackerEnemy = fang_diren.size >= 1 && fang_diren.has(attackerId);
     const isVictimEnemy = fang_diren.size >= 1 && fang_diren.has(victimId);
     if (isAttackerFriend && isVictimEnemy) {
-        return [`${attackerName}[${attackerHealth}]`, ` 1-> ${damageInfo} -> `, `${victimName}[${victimHealth}]`];
+        return {
+            timestamp: event._D,
+            direction: ">>",
+            A: `${attackerName}[${attackerHealth}]`,
+            B: damageInfo,
+            C: `${victimName}[${victimHealth}]`
+        };
     }
     if (isAttackerEnemy && isVictimFriend) {
-        return [`${victimName}[${victimHealth}]`, ` 2<- ${damageInfo} <- `, `${attackerName}[${attackerHealth}]`];
+        return {
+            timestamp: event._D,
+            direction: "<<",
+            A: `${victimName}[${victimHealth}]`,
+            B: damageInfo,
+            C: `${attackerName}[${attackerHealth}]`
+        };
     }
     if (isAttackerFriend) {
-        return [`${attackerName}[${attackerHealth}]`, ` 3-> ${damageInfo} -> `, `${victimName}[${victimHealth}]`];
+        return {
+            timestamp: event._D,
+            direction: ">>",
+            A: `${attackerName}[${attackerHealth}] `,
+            B: damageInfo,
+            C: `${victimName}[${victimHealth}]`
+        };
     }
     if (isVictimFriend) {
-        return [`${victimName}[${victimHealth}]`, ` 4<- ${damageInfo} <- `, `${attackerName}[${attackerHealth}]`];
+        return {
+            timestamp: event._D,
+            direction: "<<",
+            A: `${victimName}[${victimHealth}]`,
+            B: damageInfo,
+            C: `${attackerName}[${attackerHealth}]`
+        };
     }
     return null;
 }
 function rendertemlog() {
     document.getElementById('telemetry').innerHTML = ''; // Clear existing content
     let x = "";
+    const table = document.createElement('table');
+    table.style.borderCollapse = 'collapse';
+    table.style.width = '100%';
+    table.style.border = '1px solid black';
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const headers = ['Timestamp', 'A', 'Direction', 'B', 'Direction', 'C'];
+    headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        th.style.border = '1px solid black';
+        th.style.textAlign = 'center';
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    const tbody = document.createElement('tbody');
     for (const item of telemetry_data) {
-        let x1;
+        let x1 = null;
         switch (item._T) {
             case 'LogPlayerTakeDamage':
                 x1 = print_LogPlayerTakeDamage(item);
@@ -69,11 +110,21 @@ function rendertemlog() {
                 continue;
         }
         if (x1) {
-            const [a, b, c] = x1;
-            x += a + ' ' + b + ' ' + c + '<br>';
+            const { timestamp, direction, A, B, C } = x1;
+            const row = document.createElement('tr');
+            const cells = [timestamp, A, direction, B, direction, C];
+            cells.forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                td.style.border = '1px solid black';
+                td.style.textAlign = 'center';
+                row.appendChild(td);
+            });
+            tbody.appendChild(row);
         }
     }
-    document.getElementById('telemetry').innerHTML = x; // Update content
+    table.appendChild(tbody);
+    document.getElementById('telemetry').appendChild(table); // Update content
 }
 function renderItems(items) {
     const container = document.getElementById('items');
