@@ -1,3 +1,1 @@
-```sh
-npm i -g http-server
-```
+https://shinhwagk.github.io/pubg_telemetry/
