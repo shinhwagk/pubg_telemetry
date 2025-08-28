@@ -1,0 +1,51 @@
+#items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    /* Space between team boxes */
+}
+
+.team-container {
+    border: 2px solid #333;
+    padding: 10px;
+    margin: 5px;
+    width: 220px;
+    /* Reduced width to fit more teams */
+    height: 180px;
+    /* Adjusted fixed height */
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+}
+
+.team-header {
+    font-size: 1.2em;
+    /* Smaller font size */
+    font-weight: bold;
+    margin-bottom: 8px;
+    height: 25px;
+    /* Reduced header height */
+}
+
+.member-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 3px 0;
+    /* Reduced margin */
+    height: 25px;
+    /* Reduced row height */
+    font-size: 0.9em;
+    /* Smaller font for members */
+}
+
+.checkboxes {
+    display: flex;
+    gap: 8px;
+    /* Reduced gap between checkboxes */
+}
+
+.empty-row {
+    height: 25px;
+    /* Match reduced member row height */
+}
