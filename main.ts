@@ -133,6 +133,7 @@ function rendertemlog() {
         if (x1) {
             const { timestamp, direction, A, B, C } = x1;
             const row = document.createElement('tr');
+            row.style.backgroundColor = direction === '<<' ? '#E6F0FA' : direction === '>>' ? '#FFF5F5' : 'white';
             const cells = [timestamp, A, direction, B, direction, C];
 
             cells.forEach(cellText => {
